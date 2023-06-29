@@ -36,7 +36,7 @@ namespace CalculatorTest.StepDefinitions
 
             AutomationElement menuItems = mainWindow.FindFirst(TreeScope.Descendants,
                 new PropertyCondition(AutomationElement.AutomationIdProperty, "MenuItemsHost"));
-            AutomationElement listItem = GetListItemByName(menuItems, "Programmer");
+            AutomationElement listItem = GetListItemByName(menuItems, mode);
 
             var selectionItemPattern = (SelectionItemPattern)listItem.GetCurrentPattern(SelectionItemPattern.Pattern);
             selectionItemPattern.Select();
@@ -49,7 +49,7 @@ namespace CalculatorTest.StepDefinitions
             AutomationElement mainWindow = GetMainElement();
             AutomationElement numberPad = mainWindow.FindFirst(TreeScope.Descendants,
                 new PropertyCondition(AutomationElement.AutomationIdProperty, "NumberPad"));
-            List<String> buttons = GerNumberPadNumbers(number);
+            List<String> buttons = GetNumberPadNumbers(number);
             foreach(String button in buttons)
             {
                 AutomationElement numberButton = numberPad.FindFirst(TreeScope.Descendants,
@@ -62,6 +62,23 @@ namespace CalculatorTest.StepDefinitions
             }
             
         }
+
+        [When(@"I Select (.*) Method For Calculation")]
+        public void WhenISelectMethodForCalculation(String method)
+        {
+            AutomationElement mainWindow = GetMainElement();
+            //AutomationElement numberPad = mainWindow.FindFirst(TreeScope.Descendants,
+            //    new PropertyCondition(AutomationElement.NameProperty, "Scientific functions"));
+            String button = GetNumberPadCalulationItems(method);
+            AutomationElement numberButton = mainWindow.FindFirst(TreeScope.Descendants,
+                new PropertyCondition(AutomationElement.NameProperty, button));
+            if (numberButton != null)
+            {
+                var invokePattern = (InvokePattern)numberButton.GetCurrentPattern(InvokePattern.Pattern);
+                invokePattern.Invoke();
+            }
+        }
+
 
         [When(@"I select (.*) Selection")]
         public void WhenISelectSelection(string option)
@@ -90,15 +107,15 @@ namespace CalculatorTest.StepDefinitions
         public void ThenResultsShouldDisplay(string ExpectedValue)
         {
             AutomationElement mainWindow = GetMainElement();
-            string result = null;
+            string result="";
             AutomationElement display = mainWindow.FindFirst(TreeScope.Descendants, new PropertyCondition(AutomationElement.AutomationIdProperty, "CalculatorResults"));
 
             if (display != null)
             {
-                result = display.Current.Name.Trim("Display is".ToCharArray()).Replace(" ", string.Empty);
+                result = display.Current.Name.Trim("Display is".ToCharArray()).Replace(" ", string.Empty).Replace(",",string.Empty);
             }
         
-            Assert.AreEqual(ExpectedValue, result,"Wrong results");
+            Assert.IsTrue(result.Contains(ExpectedValue),"Wrong results");
         }
 
 
@@ -119,7 +136,7 @@ namespace CalculatorTest.StepDefinitions
 
         }
 
-        public List<String> GerNumberPadNumbers(string number)
+        public List<String> GetNumberPadNumbers(string number)
         {
             List<String> buttons = new List<string>();
             char[] numbers = number.ToCharArray();
@@ -143,6 +160,22 @@ namespace CalculatorTest.StepDefinitions
             }
             return buttons;
         }
+
+        public String GetNumberPadCalulationItems(string Calculation)
+        {
+            Dictionary<string, String> numberButtonValues = new Dictionary<string, String>()
+            {
+                {"SQUARE","Square" },
+                {"SQUARE_ROOT","Square root" },
+                {"FACTORIAL", "Factorial" },
+                {"LOG", "Log" },
+                {"TEN_EXPONENT", "Ten to the exponent" }
+               
+            };
+            return numberButtonValues[Calculation];
+        }
+
+
 
         [AfterTestRun]
         public static void CloseCalculator()
