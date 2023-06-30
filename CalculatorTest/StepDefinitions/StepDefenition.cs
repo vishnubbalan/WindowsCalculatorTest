@@ -148,42 +148,36 @@ namespace CalculatorTest.StepDefinitions
                 datePicker = mainWindow.FindFirst(TreeScope.Descendants,
                     new PropertyCondition(AutomationElement.AutomationIdProperty, "DateDiff_ToDate"));
             }
-            ClickButton(datePicker);
 
+            ClickButton(datePicker);
             AutomationElement yearPicker = mainWindow.FindFirst(TreeScope.Descendants,
                 new PropertyCondition(AutomationElement.AutomationIdProperty, "HeaderButton"));
             ClickButton(yearPicker);
 
             ClickButton(datePicker);
-
             AutomationElement monthPicker = mainWindow.FindFirst(TreeScope.Descendants,
                 new PropertyCondition(AutomationElement.NameProperty, month));
             ClickButton(monthPicker);
 
             ClickButton(datePicker);
+            SelectCalenderDayForAMonth(datePicker,mainWindow,day);
 
-            AutomationElement calView = mainWindow.FindFirst(TreeScope.Descendants,
-                new PropertyCondition(AutomationElement.AutomationIdProperty, "CalendarView"));
-            ClickButton(datePicker);
-            Thread.Sleep(2000);
-            AutomationElementCollection dataItems = calView.FindAll(TreeScope.Descendants,
-                new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.DataItem));
-            foreach (AutomationElement dataItem in dataItems)
-            {
-                string? dateText = dataItem.GetCurrentPropertyValue(AutomationElement.NameProperty) as string;
-                if (dateText.Equals(day))
-                {
-                    SelectionItemPattern selectionPattern = dataItem.GetCurrentPattern(SelectionItemPattern.Pattern) as SelectionItemPattern;
-                    if (selectionPattern != null)
-                    {
-                        selectionPattern.Select();
-                        break;
-                    }
-                }
-            }
-            //ClickButton(dayPicker);
 
         }
+
+
+        [Then(@"Day Difference shows (.*) days")]
+        public void ThenDayDifferenceShowsDays(String numberOfDays)
+        {
+            throw new PendingStepException();
+        }
+
+        [Then(@"Week Difference shows (.*)")]
+        public void ThenWeekDifferenceShows(String WeekDifference)
+        {
+            throw new PendingStepException();
+        }
+
 
 
 
@@ -281,6 +275,30 @@ namespace CalculatorTest.StepDefinitions
         {
             var invokePattern = (SelectionItemPattern)element.GetCurrentPattern(SelectionItemPattern.Pattern);
             invokePattern.Select();
+        }
+
+        public void SelectCalenderDayForAMonth(AutomationElement datePicker, AutomationElement mainWindow, string day)
+        {
+            AutomationElement calView = mainWindow.FindFirst(TreeScope.Descendants,
+                new PropertyCondition(AutomationElement.AutomationIdProperty, "CalendarView"));
+            ClickButton(datePicker);
+
+            Thread.Sleep(2000);
+            AutomationElementCollection dataItems = calView.FindAll(TreeScope.Descendants,
+                new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.DataItem));
+            foreach (AutomationElement dataItem in dataItems)
+            {
+                string dateText = dataItem.GetCurrentPropertyValue(AutomationElement.NameProperty) as string;
+                if (dateText.Equals(day))
+                {
+                    SelectionItemPattern selectionPattern = dataItem.GetCurrentPattern(SelectionItemPattern.Pattern) as SelectionItemPattern;
+                    if (selectionPattern != null)
+                    {
+                        selectionPattern.Select();
+                        break;
+                    }
+                }
+            }
         }
     }
 }
