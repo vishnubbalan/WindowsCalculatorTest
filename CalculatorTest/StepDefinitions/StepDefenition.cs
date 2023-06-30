@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Globalization;
 using System.Linq;
 using System.Security.Policy;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Automation;
 using System.Windows.Automation.Text;
+using System.Xml.Linq;
 using static System.Net.Mime.MediaTypeNames;
 
 
@@ -118,6 +120,71 @@ namespace CalculatorTest.StepDefinitions
             Assert.IsTrue(result.Contains(ExpectedValue),"Wrong results");
         }
 
+        [When(@"I select Difference Between Dates")]
+        public void WhenISelectDifferenceBetweenDates()
+        {
+            AutomationElement mainWindow = GetMainElement();
+            AutomationElement comboSelector = mainWindow.FindFirst(TreeScope.Descendants,
+                new PropertyCondition(AutomationElement.AutomationIdProperty, "DateCalculationOption"));
+            ExpandComboBox(comboSelector);
+
+            AutomationElement comboBoxItem = mainWindow.FindFirst(TreeScope.Descendants,
+                new PropertyCondition(AutomationElement.NameProperty, "Difference between dates"));
+            SelectComboBoxItem(comboBoxItem);
+        }
+
+        [When(@"I Select (.*) of (.*) in (.*) DateSelector")]
+        public void WhenISelectOfInDateSelector(string day, string month, string DateType)
+        {
+            AutomationElement datePicker = null;
+            AutomationElement mainWindow = GetMainElement();
+            if(DateType == "StartDate")
+            {
+                datePicker = mainWindow.FindFirst(TreeScope.Descendants,
+                    new PropertyCondition(AutomationElement.AutomationIdProperty, "DateDiff_FromDate"));
+            }
+            else if( DateType == "EndDate")
+            {
+                datePicker = mainWindow.FindFirst(TreeScope.Descendants,
+                    new PropertyCondition(AutomationElement.AutomationIdProperty, "DateDiff_ToDate"));
+            }
+            ClickButton(datePicker);
+
+            AutomationElement yearPicker = mainWindow.FindFirst(TreeScope.Descendants,
+                new PropertyCondition(AutomationElement.AutomationIdProperty, "HeaderButton"));
+            ClickButton(yearPicker);
+
+            ClickButton(datePicker);
+
+            AutomationElement monthPicker = mainWindow.FindFirst(TreeScope.Descendants,
+                new PropertyCondition(AutomationElement.NameProperty, month));
+            ClickButton(monthPicker);
+
+            ClickButton(datePicker);
+
+            AutomationElement calView = mainWindow.FindFirst(TreeScope.Descendants,
+                new PropertyCondition(AutomationElement.AutomationIdProperty, "CalendarView"));
+            ClickButton(datePicker);
+            Thread.Sleep(2000);
+            AutomationElementCollection dataItems = calView.FindAll(TreeScope.Descendants,
+                new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.DataItem));
+            foreach (AutomationElement dataItem in dataItems)
+            {
+                string? dateText = dataItem.GetCurrentPropertyValue(AutomationElement.NameProperty) as string;
+                if (dateText.Equals(day))
+                {
+                    SelectionItemPattern selectionPattern = dataItem.GetCurrentPattern(SelectionItemPattern.Pattern) as SelectionItemPattern;
+                    if (selectionPattern != null)
+                    {
+                        selectionPattern.Select();
+                        break;
+                    }
+                }
+            }
+            //ClickButton(dayPicker);
+
+        }
+
 
 
         public AutomationElement GetMainElement()
@@ -185,6 +252,35 @@ namespace CalculatorTest.StepDefinitions
             {
                 processItem.Kill();
             }
+        }
+
+        public void ExpandComboBox(AutomationElement element)
+        {
+            var expandCollapsePattern = element.GetCurrentPattern(ExpandCollapsePattern.Pattern) as ExpandCollapsePattern;
+            if (expandCollapsePattern != null)
+            {
+                expandCollapsePattern.Expand();
+            }
+        }
+        public void SelectComboBoxItem(AutomationElement element)
+        {
+            var selectionItemPattern = element.GetCurrentPattern(SelectionItemPattern.Pattern) as SelectionItemPattern;
+            if (selectionItemPattern != null)
+            {
+                selectionItemPattern.Select();
+            }
+        }
+
+        public void ClickButton(AutomationElement element)
+        {
+            var invokePattern = (InvokePattern)element.GetCurrentPattern(InvokePattern.Pattern);
+            invokePattern.Invoke();
+        }
+
+        public void ClickSelectButton(AutomationElement element)
+        {
+            var invokePattern = (SelectionItemPattern)element.GetCurrentPattern(SelectionItemPattern.Pattern);
+            invokePattern.Select();
         }
     }
 }
