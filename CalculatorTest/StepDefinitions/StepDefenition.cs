@@ -137,6 +137,7 @@ namespace CalculatorTest.StepDefinitions
         public void WhenISelectOfInDateSelector(string day, string month, string DateType)
         {
             AutomationElement datePicker = null;
+            Thread.Sleep(500);
             AutomationElement mainWindow = GetMainElement();
             if(DateType == "StartDate")
             {
@@ -148,34 +149,59 @@ namespace CalculatorTest.StepDefinitions
                 datePicker = mainWindow.FindFirst(TreeScope.Descendants,
                     new PropertyCondition(AutomationElement.AutomationIdProperty, "DateDiff_ToDate"));
             }
-
             ClickButton(datePicker);
+            Thread.Sleep(500);
             AutomationElement yearPicker = mainWindow.FindFirst(TreeScope.Descendants,
                 new PropertyCondition(AutomationElement.AutomationIdProperty, "HeaderButton"));
             ClickButton(yearPicker);
-
+            Thread.Sleep(500);
             ClickButton(datePicker);
             AutomationElement monthPicker = mainWindow.FindFirst(TreeScope.Descendants,
                 new PropertyCondition(AutomationElement.NameProperty, month));
             ClickButton(monthPicker);
 
             ClickButton(datePicker);
-            SelectCalenderDayForAMonth(datePicker,mainWindow,day);
+            if (DateType == "StartDate")
+            {
+                SelectCalenderDayForAMonth(datePicker, mainWindow, day, 1);
+            }
+            else if (DateType == "EndDate")
+            {
+                SelectCalenderDayForAMonth(datePicker, mainWindow, day, 0);
+            }
 
 
         }
 
 
-        [Then(@"Day Difference shows (.*) days")]
-        public void ThenDayDifferenceShowsDays(String numberOfDays)
+        [Then(@"Day Difference shows (.*)")]
+        public void ThenDayDifferenceShows(String numberOfDays)
         {
-            throw new PendingStepException();
+            AutomationElement mainWindow = GetMainElement();
+            AutomationElement display = mainWindow.FindFirst(TreeScope.Descendants,
+                new PropertyCondition(AutomationElement.NameProperty, numberOfDays));
+
+            if (display == null)
+            {
+                Assert.Fail("Mismatch in Number of days");
+            }
+
         }
 
         [Then(@"Week Difference shows (.*)")]
         public void ThenWeekDifferenceShows(String WeekDifference)
         {
-            throw new PendingStepException();
+            AutomationElement mainWindow = GetMainElement();
+            string result = "";
+            AutomationElement display = mainWindow.FindFirst(TreeScope.Descendants,
+                new PropertyCondition(AutomationElement.AutomationIdProperty, "DateDiffAllUnitsResultLabel"));
+
+            if (display != null)
+            {
+                result = display.Current.Name;
+            }
+
+            Assert.IsTrue(result.Contains(WeekDifference), "Wrong results");
         }
 
 
@@ -277,7 +303,7 @@ namespace CalculatorTest.StepDefinitions
             invokePattern.Select();
         }
 
-        public void SelectCalenderDayForAMonth(AutomationElement datePicker, AutomationElement mainWindow, string day)
+        public void SelectCalenderDayForAMonth(AutomationElement datePicker, AutomationElement mainWindow, string day, int flag)
         {
             AutomationElement calView = mainWindow.FindFirst(TreeScope.Descendants,
                 new PropertyCondition(AutomationElement.AutomationIdProperty, "CalendarView"));
@@ -295,7 +321,8 @@ namespace CalculatorTest.StepDefinitions
                     if (selectionPattern != null)
                     {
                         selectionPattern.Select();
-                        break;
+                        if(flag==1)
+                            break;
                     }
                 }
             }

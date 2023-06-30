@@ -134,6 +134,12 @@ this.ScenarioInitialize(scenarioInfo);
 #line 11
  testRunner.And("I Select 24 of February in EndDate DateSelector", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "And ");
 #line hidden
+#line 12
+ testRunner.Then("Day Difference shows 54 days", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
+#line 13
+ testRunner.Then("Week Difference shows 1 month, 3 weeks, 2 days", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Then ");
+#line hidden
             }
             this.ScenarioCleanup();
         }
