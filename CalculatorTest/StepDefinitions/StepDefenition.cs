@@ -49,12 +49,10 @@ namespace CalculatorTest.StepDefinitions
         public void WhenIEnterInTheNumberPad(string number)
         {
             AutomationElement mainWindow = GetMainElement();
-            AutomationElement numberPad = mainWindow.FindFirst(TreeScope.Descendants,
-                new PropertyCondition(AutomationElement.AutomationIdProperty, "NumberPad"));
             List<String> buttons = GetNumberPadNumbers(number);
             foreach(String button in buttons)
             {
-                AutomationElement numberButton = numberPad.FindFirst(TreeScope.Descendants,
+                AutomationElement numberButton = mainWindow.FindFirst(TreeScope.Descendants,
                 new PropertyCondition(AutomationElement.NameProperty, button));
                 if (numberButton != null)
                 {
@@ -69,8 +67,6 @@ namespace CalculatorTest.StepDefinitions
         public void WhenISelectMethodForCalculation(String method)
         {
             AutomationElement mainWindow = GetMainElement();
-            //AutomationElement numberPad = mainWindow.FindFirst(TreeScope.Descendants,
-            //    new PropertyCondition(AutomationElement.NameProperty, "Scientific functions"));
             String button = GetNumberPadCalulationItems(method);
             AutomationElement numberButton = mainWindow.FindFirst(TreeScope.Descendants,
                 new PropertyCondition(AutomationElement.NameProperty, button));
@@ -204,6 +200,21 @@ namespace CalculatorTest.StepDefinitions
             Assert.IsTrue(result.Contains(WeekDifference), "Wrong results");
         }
 
+        [When(@"I want to do (.*) calculation")]
+        public void WhenIWantToDoCalculation(String calculation)
+        {
+            AutomationElement mainWindow = GetMainElement();
+            String button = GetNumberStandardModeFunctionsItems(calculation);
+            AutomationElement numberButton = mainWindow.FindFirst(TreeScope.Descendants,
+                new PropertyCondition(AutomationElement.NameProperty, button));
+            if (numberButton != null)
+            {
+                var invokePattern = (InvokePattern)numberButton.GetCurrentPattern(InvokePattern.Pattern);
+                invokePattern.Invoke();
+            }
+        }
+
+
 
 
 
@@ -238,7 +249,9 @@ namespace CalculatorTest.StepDefinitions
                 {'7',"Seven" },
                 {'8', "Eight" },
                 {'9',"Nine" },
-                {'0',"Zero" }
+                {'0',"Zero" },
+                {'=',"Equals" }
+                
             };
             
             foreach (char digit in numbers)
@@ -257,12 +270,25 @@ namespace CalculatorTest.StepDefinitions
                 {"FACTORIAL", "Factorial" },
                 {"LOG", "Log" },
                 {"TEN_EXPONENT", "Ten to the exponent" }
-               
             };
             return numberButtonValues[Calculation];
         }
 
+        public String GetNumberStandardModeFunctionsItems(string function)
+        {
+            Dictionary<string, String> functionButtonValues = new Dictionary<string, String>()
+            {
+                {"ADDITION","Plus" },
+                {"SUBSTRATION","Minus" },
+                {"DIVISION", "Divide by" },
+                {"MULTIPLICATION", "Multiply by" },
+                {"SQUARE", "Square" },
+                {"SQUARE_ROOT", "Square root" },
+                {"INVERSION","Reciprocal" }
 
+            };
+            return functionButtonValues[function];
+        }
 
         [AfterTestRun]
         public static void CloseCalculator()
