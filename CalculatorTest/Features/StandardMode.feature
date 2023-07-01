@@ -20,3 +20,19 @@ Scenario Outline: StandardModeCalculationTesting
 	| SQUARE         | 11          |              | SQUARE         | 121     |
 	| SQUARE_ROOT    | 155         |              | SQUARE_ROOT    | 12.44989|
 	| INVERSION      | 154         |              | INVERSION      | 0.006493|
+
+
+
+Scenario Outline: Retreive Cancel and retreve and validate the history
+	Given I open CalculatorApp in full window
+	Given I want to do addition for following
+	| ParamOne | ParamTwo | Sum |
+	| 1        | 2        | 3   |
+	| 2        | 2        | 4   |
+	| 6        | 6        | 12  |
+	Then I can retreive the following calculations from the history
+	| Calculation | Expression | Result |
+	| 1 + 2= 3    | 1 + 2      | 3      |
+	| 2 + 2= 4    | 2 + 2      | 4      |
+
+

@@ -254,6 +254,75 @@ this.StandardModeCalculationTesting("SQUARE_ROOT", "155", "", "SQUARE_ROOT", "12
 this.StandardModeCalculationTesting("INVERSION", "154", "", "INVERSION", "0.006493", ((string[])(null)));
 #line hidden
         }
+        
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Retreive Cancel and retreve and validate the history")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "StandardMode")]
+        public virtual void RetreiveCancelAndRetreveAndValidateTheHistory()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Retreive Cancel and retreve and validate the history", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 26
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 27
+ testRunner.Given("I open CalculatorApp in full window", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table1 = new TechTalk.SpecFlow.Table(new string[] {
+                            "ParamOne",
+                            "ParamTwo",
+                            "Sum"});
+                table1.AddRow(new string[] {
+                            "1",
+                            "2",
+                            "3"});
+                table1.AddRow(new string[] {
+                            "2",
+                            "2",
+                            "4"});
+                table1.AddRow(new string[] {
+                            "6",
+                            "6",
+                            "12"});
+#line 28
+ testRunner.Given("I want to do addition for following", ((string)(null)), table1, "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table2 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Calculation",
+                            "Expression",
+                            "Result"});
+                table2.AddRow(new string[] {
+                            "1 + 2= 3",
+                            "1 + 2",
+                            "3"});
+                table2.AddRow(new string[] {
+                            "2 + 2= 4",
+                            "2 + 2",
+                            "4"});
+#line 33
+ testRunner.Then("I can retreive the following calculations from the history", ((string)(null)), table2, "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
     }
 }
 #pragma warning restore

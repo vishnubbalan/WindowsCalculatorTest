@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Automation;
 using System.Windows.Automation.Text;
 using System.Xml.Linq;
+using TechTalk.SpecFlow.CommonModels;
 using static System.Net.Mime.MediaTypeNames;
 
 
@@ -23,6 +24,24 @@ namespace CalculatorTest.StepDefinitions
             Process.Start("calc");
             Thread.Sleep(5000);
         }
+
+
+        [Given(@"I open CalculatorApp in full window")]
+        public void GivenIOpenCalculatorAppInFullWindow()
+        {
+            Process.Start("calc");
+            Thread.Sleep(5000);
+            Condition condition = new AndCondition(
+                new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Window),
+                new PropertyCondition(AutomationElement.NameProperty, "Calculator"));
+            AutomationElement element = AutomationElement.RootElement.FindFirst(TreeScope.Descendants, condition);
+            WindowPattern windowPattern = (WindowPattern)element.GetCurrentPattern(WindowPattern.Pattern);
+            if (windowPattern != null)
+            {
+                windowPattern.SetWindowVisualState(WindowVisualState.Maximized);
+            }
+        }
+
 
         [When(@"I Select (.*) Mode")]
         public void WhenISelectMode(string mode)
@@ -44,6 +63,47 @@ namespace CalculatorTest.StepDefinitions
             selectionItemPattern.Select();
             Thread.Sleep(1000);
         }
+
+        [Given(@"I want to do addition for following")]
+        public void GivenIWantToDoAdditionForFollowing(Table table)
+        {
+            foreach(var row in table.Rows)
+            {
+                string param1 = row[0].ToString();
+                string param2 = row[1].ToString();
+                string result = row[2].ToString();
+                WhenIEnterInTheNumberPad(param1);
+                WhenIWantToDoCalculation("ADDITION");
+                WhenIEnterInTheNumberPad(param2);
+                WhenIEnterInTheNumberPad("=");
+            }
+        }
+
+        [Then(@"I can retreive the following calculations from the history")]
+        public void ThenICanRetreiveTheFollowingCalculationsFromTheHistory(Table table)
+        {
+            AutomationElement mainWindow = GetMainElement();
+            AutomationElement historyList = mainWindow.FindFirst(TreeScope.Descendants,
+                new PropertyCondition(AutomationElement.AutomationIdProperty, "HistoryListView"));
+            AutomationElementCollection historyListItems = historyList.FindAll(TreeScope.Children,
+                new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.ListItem));
+            foreach(var row in table.Rows)
+            {
+                string history = row[0].ToString();
+                AutomationElement historyItem = historyList.FindFirst(TreeScope.Children,
+                    new PropertyCondition(AutomationElement.NameProperty, history));
+                InvokePattern invokePattern = (InvokePattern)historyItem.GetCurrentPattern(InvokePattern.Pattern);
+                if (invokePattern != null)
+                    invokePattern.Invoke();
+                string expression = GetTextElementContaineText("CalculatorExpression");
+                Assert.IsTrue(expression.Contains(row[1].ToString()), "Wrong Expression");
+                String result = GetTextElementContaineText("CalculatorResults");
+                Assert.IsTrue(result.Contains(row[2].ToString()), "Wrong Result");
+
+            }
+        }
+
+
 
         [When(@"I enter (.*) in the NumberPad")]
         public void WhenIEnterInTheNumberPad(string number)
@@ -352,6 +412,19 @@ namespace CalculatorTest.StepDefinitions
                     }
                 }
             }
+        }
+
+        public string GetTextElementContaineText(string automationIdProperty)
+        {
+            AutomationElement mainWindow = GetMainElement();
+            AutomationElement calculatorExpression = mainWindow.FindFirst(TreeScope.Descendants,
+                new PropertyCondition(AutomationElement.AutomationIdProperty, automationIdProperty));
+            string text = "";
+            if (calculatorExpression != null)
+            {
+                text = calculatorExpression.Current.Name;
+            }
+            return text;
         }
     }
 }
