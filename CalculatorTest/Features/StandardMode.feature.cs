@@ -303,7 +303,7 @@ this.ScenarioInitialize(scenarioInfo);
                             "6",
                             "12"});
 #line 28
- testRunner.Given("I want to do addition for following", ((string)(null)), table1, "Given ");
+ testRunner.When("I want to do addition for following", ((string)(null)), table1, "When ");
 #line hidden
                 TechTalk.SpecFlow.Table table2 = new TechTalk.SpecFlow.Table(new string[] {
                             "Calculation",
@@ -319,6 +319,69 @@ this.ScenarioInitialize(scenarioInfo);
                             "4"});
 #line 33
  testRunner.Then("I can retreive the following calculations from the history", ((string)(null)), table2, "Then ");
+#line hidden
+            }
+            this.ScenarioCleanup();
+        }
+        
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestMethodAttribute()]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.DescriptionAttribute("Verify Memory Addition and Retrival")]
+        [Microsoft.VisualStudio.TestTools.UnitTesting.TestPropertyAttribute("FeatureTitle", "StandardMode")]
+        public virtual void VerifyMemoryAdditionAndRetrival()
+        {
+            string[] tagsOfScenario = ((string[])(null));
+            System.Collections.Specialized.OrderedDictionary argumentsOfScenario = new System.Collections.Specialized.OrderedDictionary();
+            TechTalk.SpecFlow.ScenarioInfo scenarioInfo = new TechTalk.SpecFlow.ScenarioInfo("Verify Memory Addition and Retrival", null, tagsOfScenario, argumentsOfScenario, this._featureTags);
+#line 38
+this.ScenarioInitialize(scenarioInfo);
+#line hidden
+            bool isScenarioIgnored = default(bool);
+            bool isFeatureIgnored = default(bool);
+            if ((tagsOfScenario != null))
+            {
+                isScenarioIgnored = tagsOfScenario.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((this._featureTags != null))
+            {
+                isFeatureIgnored = this._featureTags.Where(__entry => __entry != null).Where(__entry => String.Equals(__entry, "ignore", StringComparison.CurrentCultureIgnoreCase)).Any();
+            }
+            if ((isScenarioIgnored || isFeatureIgnored))
+            {
+                testRunner.SkipScenario();
+            }
+            else
+            {
+                this.ScenarioStart();
+#line 39
+ testRunner.Given("I open CalculatorApp in full window", ((string)(null)), ((TechTalk.SpecFlow.Table)(null)), "Given ");
+#line hidden
+                TechTalk.SpecFlow.Table table3 = new TechTalk.SpecFlow.Table(new string[] {
+                            "ParamOne",
+                            "ParamTwo",
+                            "Sum"});
+                table3.AddRow(new string[] {
+                            "1",
+                            "2",
+                            "3"});
+                table3.AddRow(new string[] {
+                            "2",
+                            "2",
+                            "4"});
+                table3.AddRow(new string[] {
+                            "6",
+                            "6",
+                            "12"});
+#line 40
+ testRunner.When("I want to do addition for following with memory addition", ((string)(null)), table3, "When ");
+#line hidden
+                TechTalk.SpecFlow.Table table4 = new TechTalk.SpecFlow.Table(new string[] {
+                            "Result"});
+                table4.AddRow(new string[] {
+                            "3"});
+                table4.AddRow(new string[] {
+                            "4"});
+#line 45
+ testRunner.Then("I can retreive the following calculations from the memory", ((string)(null)), table4, "Then ");
 #line hidden
             }
             this.ScenarioCleanup();

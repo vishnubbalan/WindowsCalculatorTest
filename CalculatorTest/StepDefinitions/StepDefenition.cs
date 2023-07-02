@@ -64,8 +64,8 @@ namespace CalculatorTest.StepDefinitions
             Thread.Sleep(1000);
         }
 
-        [Given(@"I want to do addition for following")]
-        public void GivenIWantToDoAdditionForFollowing(Table table)
+        [When(@"I want to do addition for following")]
+        public void WhenIWantToDoAdditionForFollowing(Table table)
         {
             foreach (var row in table.Rows)
             {
@@ -78,6 +78,23 @@ namespace CalculatorTest.StepDefinitions
                 WhenIEnterInTheNumberPad("=");
             }
         }
+
+        [When(@"I want to do addition for following with memory addition")]
+        public void WhenIWantToDoAdditionForFollowingWithMemoryAddition(Table table)
+        {
+            foreach (var row in table.Rows)
+            {
+                string param1 = row[0].ToString();
+                string param2 = row[1].ToString();
+                string result = row[2].ToString();
+                WhenIEnterInTheNumberPad(param1);
+                WhenIWantToDoCalculation("ADDITION");
+                WhenIEnterInTheNumberPad(param2);
+                WhenIEnterInTheNumberPad("=");
+                StoreToMemory();
+            }
+        }
+
 
         [Then(@"I can retreive the following calculations from the history")]
         public void ThenICanRetreiveTheFollowingCalculationsFromTheHistory(Table table)
@@ -114,6 +131,52 @@ namespace CalculatorTest.StepDefinitions
                 Assert.IsTrue(expression.Contains(row[1].ToString()), "Wrong Expression");
                 String result = GetTextElementContaineText("CalculatorResults");
                 Assert.IsTrue(result.Contains(row[2].ToString()), "Wrong Result");
+
+            }
+        }
+
+        [Then(@"I can retreive the following calculations from the memory")]
+        public void ThenICanRetreiveTheFollowingCalculationsFromTheMemory(Table table)
+        {
+
+            AutomationElement mainWindow = GetMainElement();
+            AutomationElement historyList = mainWindow.FindFirst(TreeScope.Descendants,
+                new PropertyCondition(AutomationElement.AutomationIdProperty, "MemoryLabel"));
+            SelectionItemPattern pattern = (SelectionItemPattern)historyList.GetCurrentPattern(SelectionItemPattern.Pattern);
+            if (pattern != null)
+            {
+                pattern.Select();
+            }
+
+            AutomationElement memoryList = mainWindow.FindFirst(TreeScope.Descendants,
+                new PropertyCondition(AutomationElement.AutomationIdProperty, "MemoryListView"));
+            AutomationElementCollection memoryListItems = memoryList.FindAll(TreeScope.Children,
+                new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.ListItem));
+            foreach (var row in table.Rows)
+            {
+                string history = row[0].ToString();
+                AutomationElement historyItem = memoryList.FindFirst(TreeScope.Children,
+                    new PropertyCondition(AutomationElement.NameProperty, history));
+                if (historyItem != null)
+                {
+                    InvokePattern invokePattern = (InvokePattern)historyItem.GetCurrentPattern(InvokePattern.Pattern);
+                    if (invokePattern != null)
+                        invokePattern.Invoke();
+                }
+                else
+                {
+                    AutomationElement textItem = GetListItemConatiningTextItem(memoryListItems, row[0].ToString());
+                    if (textItem != null)
+                    {
+                        InvokePattern invokePattern = (InvokePattern)textItem.GetCurrentPattern(InvokePattern.Pattern);
+                        if (invokePattern != null)
+                            invokePattern.Invoke();
+                    }
+                }
+
+
+                String result = GetTextElementContaineText("CalculatorResults");
+                Assert.IsTrue(result.Contains(row[0].ToString()), "Wrong Result");
 
             }
         }
@@ -466,6 +529,18 @@ namespace CalculatorTest.StepDefinitions
                 text = calculatorExpression.Current.Name;
             }
             return text;
+        }
+
+        public void StoreToMemory()
+        {
+            AutomationElement mainWindow = GetMainElement();
+            AutomationElement AddToMemButton = mainWindow.FindFirst(TreeScope.Descendants,
+                new PropertyCondition(AutomationElement.AutomationIdProperty, "memButton"));
+            InvokePattern pattern = (InvokePattern)AddToMemButton.GetCurrentPattern(InvokePattern.Pattern);
+            if(pattern != null)
+            {
+                pattern.Invoke();
+            }
         }
     }
 }

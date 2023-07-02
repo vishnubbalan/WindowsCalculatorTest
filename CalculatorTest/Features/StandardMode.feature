@@ -25,7 +25,7 @@ Scenario Outline: StandardModeCalculationTesting
 
 Scenario Outline: Retreive Cancel and retreve and validate the history
 	Given I open CalculatorApp in full window
-	Given I want to do addition for following
+	When I want to do addition for following
 	| ParamOne | ParamTwo | Sum |
 	| 1        | 2        | 3   |
 	| 2        | 2        | 4   |
@@ -34,5 +34,17 @@ Scenario Outline: Retreive Cancel and retreve and validate the history
 	| Calculation | Expression | Result |
 	| 1 + 2= 3    | 1 + 2      | 3      |
 	| 2 + 2= 4    | 2 + 2      | 4      |
+
+Scenario Outline: Verify Memory Addition and Retrival
+	Given I open CalculatorApp in full window
+	When I want to do addition for following with memory addition
+	| ParamOne | ParamTwo | Sum |
+	| 1        | 2        | 3   |
+	| 2        | 2        | 4   |
+	| 6        | 6        | 12  |
+	Then I can retreive the following calculations from the memory
+	| Result |
+	| 3      |
+	| 4      |
 
 
