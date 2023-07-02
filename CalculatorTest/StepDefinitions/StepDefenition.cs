@@ -48,8 +48,8 @@ namespace CalculatorTest.StepDefinitions
         {
             AutomationElement mainWindow = GetMainElement();
             AutomationElement togglePaneButton = mainWindow.FindFirst(TreeScope.Descendants,
-                new PropertyCondition(AutomationElement.AutomationIdProperty,"TogglePaneButton"));
-            if(togglePaneButton != null)
+                new PropertyCondition(AutomationElement.AutomationIdProperty, "TogglePaneButton"));
+            if (togglePaneButton != null)
             {
                 var invokePatterns = (InvokePattern)togglePaneButton.GetCurrentPattern(InvokePattern.Pattern);
                 invokePatterns.Invoke();
@@ -67,7 +67,7 @@ namespace CalculatorTest.StepDefinitions
         [Given(@"I want to do addition for following")]
         public void GivenIWantToDoAdditionForFollowing(Table table)
         {
-            foreach(var row in table.Rows)
+            foreach (var row in table.Rows)
             {
                 string param1 = row[0].ToString();
                 string param2 = row[1].ToString();
@@ -87,14 +87,29 @@ namespace CalculatorTest.StepDefinitions
                 new PropertyCondition(AutomationElement.AutomationIdProperty, "HistoryListView"));
             AutomationElementCollection historyListItems = historyList.FindAll(TreeScope.Children,
                 new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.ListItem));
-            foreach(var row in table.Rows)
+            foreach (var row in table.Rows)
             {
                 string history = row[0].ToString();
                 AutomationElement historyItem = historyList.FindFirst(TreeScope.Children,
                     new PropertyCondition(AutomationElement.NameProperty, history));
-                InvokePattern invokePattern = (InvokePattern)historyItem.GetCurrentPattern(InvokePattern.Pattern);
-                if (invokePattern != null)
-                    invokePattern.Invoke();
+                if (historyItem != null)
+                {
+                    InvokePattern invokePattern = (InvokePattern)historyItem.GetCurrentPattern(InvokePattern.Pattern);
+                    if (invokePattern != null)
+                        invokePattern.Invoke();
+                }
+                else
+                {
+                    AutomationElement textItem = GetListItemConatiningTextItem(historyListItems, row[1].ToString() + "=");
+                    if (textItem != null)
+                    {
+                        InvokePattern invokePattern = (InvokePattern)textItem.GetCurrentPattern(InvokePattern.Pattern);
+                        if (invokePattern != null)
+                            invokePattern.Invoke();
+                    }
+                }
+
+
                 string expression = GetTextElementContaineText("CalculatorExpression");
                 Assert.IsTrue(expression.Contains(row[1].ToString()), "Wrong Expression");
                 String result = GetTextElementContaineText("CalculatorResults");
@@ -110,7 +125,7 @@ namespace CalculatorTest.StepDefinitions
         {
             AutomationElement mainWindow = GetMainElement();
             List<String> buttons = GetNumberPadNumbers(number);
-            foreach(String button in buttons)
+            foreach (String button in buttons)
             {
                 AutomationElement numberButton = mainWindow.FindFirst(TreeScope.Descendants,
                 new PropertyCondition(AutomationElement.NameProperty, button));
@@ -120,7 +135,7 @@ namespace CalculatorTest.StepDefinitions
                     invokePattern.Invoke();
                 }
             }
-            
+
         }
 
         [When(@"I Select (.*) Method For Calculation")]
@@ -153,8 +168,8 @@ namespace CalculatorTest.StepDefinitions
 
             AutomationElement mainWindow = GetMainElement();
             AutomationElement selectorRadio = mainWindow.FindFirst(TreeScope.Descendants,
-                new PropertyCondition(AutomationElement.AutomationIdProperty,automationIdProperty));
-            if(selectorRadio != null)
+                new PropertyCondition(AutomationElement.AutomationIdProperty, automationIdProperty));
+            if (selectorRadio != null)
             {
                 var selectRadioPattern = (SelectionItemPattern)selectorRadio.GetCurrentPattern(SelectionItemPattern.Pattern);
                 selectRadioPattern.Select();
@@ -165,15 +180,15 @@ namespace CalculatorTest.StepDefinitions
         public void ThenResultsShouldDisplay(string ExpectedValue)
         {
             AutomationElement mainWindow = GetMainElement();
-            string result="";
+            string result = "";
             AutomationElement display = mainWindow.FindFirst(TreeScope.Descendants, new PropertyCondition(AutomationElement.AutomationIdProperty, "CalculatorResults"));
 
             if (display != null)
             {
-                result = display.Current.Name.Trim("Display is".ToCharArray()).Replace(" ", string.Empty).Replace(",",string.Empty);
+                result = display.Current.Name.Trim("Display is".ToCharArray()).Replace(" ", string.Empty).Replace(",", string.Empty);
             }
-        
-            Assert.IsTrue(result.Contains(ExpectedValue),"Wrong results");
+
+            Assert.IsTrue(result.Contains(ExpectedValue), "Wrong results");
         }
 
         [When(@"I select Difference Between Dates")]
@@ -195,12 +210,12 @@ namespace CalculatorTest.StepDefinitions
             AutomationElement datePicker = null;
             Thread.Sleep(500);
             AutomationElement mainWindow = GetMainElement();
-            if(DateType == "StartDate")
+            if (DateType == "StartDate")
             {
                 datePicker = mainWindow.FindFirst(TreeScope.Descendants,
                     new PropertyCondition(AutomationElement.AutomationIdProperty, "DateDiff_FromDate"));
             }
-            else if( DateType == "EndDate")
+            else if (DateType == "EndDate")
             {
                 datePicker = mainWindow.FindFirst(TreeScope.Descendants,
                     new PropertyCondition(AutomationElement.AutomationIdProperty, "DateDiff_ToDate"));
@@ -289,8 +304,34 @@ namespace CalculatorTest.StepDefinitions
         {
             Condition condition = new AndCondition(
                 new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.ListItem),
-                new PropertyCondition(AutomationElement.AutomationIdProperty,itemId));
+                new PropertyCondition(AutomationElement.AutomationIdProperty, itemId));
             return listContainer.FindFirst(TreeScope.Children, condition);
+
+        }
+
+        public AutomationElement GetTextItemByName(AutomationElement listContainer, string name)
+        {
+            Condition condition = new AndCondition(
+                new PropertyCondition(AutomationElement.ControlTypeProperty, ControlType.Text),
+                new PropertyCondition(AutomationElement.NameProperty, name));
+            return listContainer.FindFirst(TreeScope.Descendants, condition);
+
+        }
+
+        public AutomationElement GetListItemConatiningTextItem(AutomationElementCollection container, string text)
+        {
+            foreach (AutomationElement item in container)
+            {
+                AutomationElement textItem = item.FindFirst(TreeScope.Descendants,
+                    new PropertyCondition(AutomationElement.NameProperty, text));
+                if (textItem != null)
+                {
+                    return item;
+                }
+
+            }
+            return null;
+
 
         }
 
@@ -311,9 +352,9 @@ namespace CalculatorTest.StepDefinitions
                 {'9',"Nine" },
                 {'0',"Zero" },
                 {'=',"Equals" }
-                
+
             };
-            
+
             foreach (char digit in numbers)
             {
                 buttons.Add(numberButtonValues[digit]);
@@ -407,7 +448,7 @@ namespace CalculatorTest.StepDefinitions
                     if (selectionPattern != null)
                     {
                         selectionPattern.Select();
-                        if(flag==1)
+                        if (flag == 1)
                             break;
                     }
                 }
